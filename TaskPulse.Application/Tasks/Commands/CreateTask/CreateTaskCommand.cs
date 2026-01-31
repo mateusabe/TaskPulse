@@ -7,6 +7,6 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
     public record CreateTaskCommand(
         string Title,
         int SlaHours,
-        FileUpload File
+        FileUpload? File
     ) : IRequest<Guid>;
 }

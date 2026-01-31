@@ -25,8 +25,9 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
         {
             var sla = new Sla(request.SlaHours);
             var now = DateTime.UtcNow;
+            var filePath = string.Empty;   
 
-            var filePath = await _fileStorage.SaveAsync(request.File);
+            if(request.File != null) filePath = await _fileStorage.SaveAsync(request.File, cancellationToken);
 
             var task = new TaskEntity(
                 request.Title,
