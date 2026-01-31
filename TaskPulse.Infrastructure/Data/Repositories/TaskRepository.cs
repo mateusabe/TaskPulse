@@ -17,6 +17,7 @@ namespace TaskPulse.Infrastructure.Data.Repositories
         public async Task AddAsync(TaskEntity task)
         {
             await _context.Tasks.AddAsync(task);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<TaskEntity?> GetByIdAsync(Guid id)

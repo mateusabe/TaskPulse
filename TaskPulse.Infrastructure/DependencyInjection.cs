@@ -30,7 +30,7 @@ namespace TaskPulse.Infrastructure
             services.AddScoped<IFileStorage, LocalFileStorage>();
 
             // SLA observers
-            services.AddScoped<ISlaExpiredObserver, LogSlaExpiredObserver>();
+            services.AddSingleton<ISlaExpiredObserver, LogSlaExpiredObserver>();
 
             // Background service
             services.AddHostedService<SlaMonitorService>();
