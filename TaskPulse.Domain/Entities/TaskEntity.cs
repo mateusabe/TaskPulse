@@ -32,13 +32,13 @@ namespace TaskPulse.Domain.Entities
             IsCompleted = false;
         }
 
-        public void Complete()
+        public void Complete(DateTimeOffset now)
         {
             if (IsCompleted)
                 throw new DomainException("Tarefa já está concluída");
 
             IsCompleted = true;
-            CompletedAt = DateTime.UtcNow;
+            CompletedAt = now;
         }
 
         public bool IsSlaExpired(DateTimeOffset now)

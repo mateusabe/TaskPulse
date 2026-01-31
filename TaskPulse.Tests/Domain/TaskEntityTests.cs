@@ -43,7 +43,7 @@ namespace TaskPulse.Tests.Domain
                 now
             );
 
-            task.Complete();
+            task.Complete(new DateTimeOffset(2026, 1, 1, 9, 0, 0, TimeSpan.Zero));
 
             Assert.True(task.IsCompleted);
             Assert.That(task.CompletedAt, Is.Not.Null);
