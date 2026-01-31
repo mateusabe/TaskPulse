@@ -23,8 +23,14 @@ namespace TaskPulse.Infrastructure
                     configuration.GetConnectionString("DefaultConnection"))
             );
 
+            services.AddDbContext<NotificationDbContext>(options =>
+                options.UseNpgsql(
+                    configuration.GetConnectionString("DefaultConnection"))
+            );
+
             // Repositories
             services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // File storage
             services.AddScoped<IFileStorage, LocalFileStorage>();

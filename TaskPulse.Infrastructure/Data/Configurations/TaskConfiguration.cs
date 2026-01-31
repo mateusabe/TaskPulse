@@ -38,7 +38,7 @@ namespace TaskPulse.Infrastructure.Data.Configurations
                    .IsRequired();
 
             builder.Property(n => n.AttachmentPath)
-                   .HasColumnName("attachment_path");
+                   .HasColumnName("attachment_path");            
 
             builder.HasIndex(x => x.IsCompleted);
             builder.HasIndex(x => x.DueAt);

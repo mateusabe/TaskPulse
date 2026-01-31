@@ -81,6 +81,6 @@ namespace TaskPulse.API.Controllers
         {
             await _mediator.Send(new CompleteTaskCommand(id));
             return NoContent();
-        }
+        }        
     }
 }
