@@ -5,14 +5,14 @@ namespace TaskPulse.Domain.Entities
 {
     public class TaskEntity
     {
+        public const int MaxTitleLength = 150;
         public Guid Id { get; private set; }
         public string Title { get; private set; }
         public DateTimeOffset CreatedAt { get; private set; }
         public DateTimeOffset DueAt { get; private set; }
         public bool IsCompleted { get; private set; }
         public DateTimeOffset? CompletedAt { get; private set; }
-        public string AttachmentPath { get; private set; }
-        public bool IsSlaBreached { get; private set; }        
+        public string? AttachmentPath { get; private set; }   
 
         private TaskEntity() { } // EF
 
@@ -24,6 +24,10 @@ namespace TaskPulse.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new DomainException("Título da tarefa é obrigatório");
+
+            if (title.Length > MaxTitleLength)
+                throw new DomainException(
+                    $"Título não pode exceder {MaxTitleLength} caracteres");
 
             Id = Guid.NewGuid();
             Title = title;
@@ -44,15 +48,5 @@ namespace TaskPulse.Domain.Entities
 
         public bool IsSlaExpired(DateTimeOffset now)
             => !IsCompleted && now > DueAt;
-
-        public void MarkSlaBreached()
-        {
-            if(IsCompleted)
-                throw new DomainException("Tarefa já está concluída");
-
-            if (IsSlaBreached) return;
-
-            IsSlaBreached = true;
-        }
     }
 }
