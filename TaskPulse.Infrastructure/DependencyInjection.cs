@@ -15,7 +15,8 @@ namespace TaskPulse.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            bool enableBackgroundServices = true)
         {
             // Database
             services.AddDbContext<TaskDbContext>(options =>
@@ -33,13 +34,14 @@ namespace TaskPulse.Infrastructure
             services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // File storage
-            services.AddScoped<IFileStorage, LocalFileStorage>();
+            services.AddScoped<IFileStorage, LocalFileStorage>();            
 
-            // SLA observers
-            services.AddSingleton<ISlaExpiredObserver, LogSlaExpiredObserver>();
-
-            // Background service
-            services.AddHostedService<SlaMonitorService>();
+            if (enableBackgroundServices)
+            {
+                // SLA observers
+                services.AddSingleton<ISlaExpiredObserver, LogSlaExpiredObserver>();
+                services.AddHostedService<SlaMonitorService>();
+            }
 
             return services;
         }

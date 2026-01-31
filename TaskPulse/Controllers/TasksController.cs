@@ -11,7 +11,7 @@ namespace TaskPulse.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class TasksController : Controller
+    public class TasksController : ControllerBase
     {
         private readonly IMediator _mediator;
 
@@ -43,10 +43,7 @@ namespace TaskPulse.API.Controllers
                         request.SlaHours,
                         fileUpload));
 
-                return CreatedAtAction(
-                    nameof(Get),
-                    new { id = taskId },
-                    null);
+                return Ok(taskId);
             }      
             catch (Exception ex)
             {

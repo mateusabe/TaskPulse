@@ -11,7 +11,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+
+if (!builder.Environment.IsEnvironment("Test"))
+{
+    builder.Services.AddInfrastructure(
+        builder.Configuration,
+        enableBackgroundServices: true);
+}
 
 var app = builder.Build();
 
@@ -25,3 +31,5 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
