@@ -4,6 +4,6 @@ namespace TaskPulse.Application.Abstractions.Storage
 {
     public interface IFileStorage
     {
-        Task<string> SaveAsync(FileUpload file);
+        Task<string> SaveAsync(FileUpload file, CancellationToken cancellationToken);
     }
 }

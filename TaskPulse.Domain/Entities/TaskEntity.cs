@@ -12,6 +12,7 @@ namespace TaskPulse.Domain.Entities
         public bool IsCompleted { get; private set; }
         public DateTimeOffset? CompletedAt { get; private set; }
         public string AttachmentPath { get; private set; }
+        public bool IsSlaBreached { get; private set; }        
 
         private TaskEntity() { } // EF
 
@@ -43,5 +44,15 @@ namespace TaskPulse.Domain.Entities
 
         public bool IsSlaExpired(DateTimeOffset now)
             => !IsCompleted && now > DueAt;
+
+        public void MarkSlaBreached()
+        {
+            if(IsCompleted)
+                throw new DomainException("Tarefa já está concluída");
+
+            if (IsSlaBreached) return;
+
+            IsSlaBreached = true;
+        }
     }
 }
