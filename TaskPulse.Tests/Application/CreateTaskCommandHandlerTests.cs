@@ -16,9 +16,10 @@ namespace TaskPulse.Tests.Application
             // Arrange
             var repo = new Mock<ITaskRepository>();
             var storage = new Mock<IFileStorage>();
+            CancellationToken ct = default;
 
             storage
-                .Setup(x => x.SaveAsync(It.IsAny<FileUpload>()))
+                .Setup(x => x.SaveAsync(It.IsAny<FileUpload>(), ct))
                 .ReturnsAsync("file.txt");
 
             var handler = new CreateTaskCommandHandler(
