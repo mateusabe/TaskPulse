@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="TaskPulse.Application/TaskPulse.Application.csproj" />
+    <Project Path="TaskPulse.Domain/TaskPulse.Domain.csproj" />
+    <Project Path="TaskPulse.Infrastructure/TaskPulse.Infrastructure.csproj" />
+    <Project Path="TaskPulse/TaskPulse.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="TaskPulse.Tests/TaskPulse.Tests.csproj" />
+  </Folder>
+</Solution>
