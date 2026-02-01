@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TaskPulse.Application.Abstractions.Repositories;
 using TaskPulse.Application.Abstractions.Storage;
 using TaskPulse.Infrastructure.BackgroundServices;
-using TaskPulse.Infrastructure.Data.Context;
+using TaskPulse.Infrastructure.Data;
 using TaskPulse.Infrastructure.Data.Repositories;
 using TaskPulse.Infrastructure.Observers;
 using TaskPulse.Infrastructure.Storage;
@@ -19,12 +19,7 @@ namespace TaskPulse.Infrastructure
             bool enableBackgroundServices = true)
         {
             // Database
-            services.AddDbContext<TaskDbContext>(options =>
-                options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"))
-            );
-
-            services.AddDbContext<NotificationDbContext>(options =>
+            services.AddDbContext<TaskPulseDbContext>(options =>
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection"))
             );
@@ -39,7 +34,7 @@ namespace TaskPulse.Infrastructure
             if (enableBackgroundServices)
             {
                 // SLA observers
-                services.AddSingleton<ISlaExpiredObserver, LogSlaExpiredObserver>();
+                services.AddScoped<ISlaExpiredObserver, DatabaseSlaExpiredObserver>();
                 services.AddHostedService<SlaMonitorService>();
             }
 

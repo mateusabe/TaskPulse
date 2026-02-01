@@ -13,7 +13,7 @@ namespace TaskPulse.Domain.Entities
         public bool IsCompleted { get; private set; }
         public DateTimeOffset? CompletedAt { get; private set; }
         public string? AttachmentPath { get; private set; }
-        public ICollection<Notification>? notifications { get; set; }
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
         private TaskEntity() { } // EF
 

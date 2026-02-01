@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using TaskPulse.Infrastructure.Data.Context;
+using TaskPulse.Infrastructure.Data;
 using TaskPulse.Infrastructure.Observers;
 
 namespace TaskPulse.Infrastructure.BackgroundServices
@@ -10,14 +10,11 @@ namespace TaskPulse.Infrastructure.BackgroundServices
     public class SlaMonitorService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IEnumerable<ISlaExpiredObserver> _observers;
 
         public SlaMonitorService(
-            IServiceScopeFactory scopeFactory,
-            IEnumerable<ISlaExpiredObserver> observers)
+            IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
-            _observers = observers;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,8 +29,12 @@ namespace TaskPulse.Infrastructure.BackgroundServices
         private async Task CheckExpiredSlas(CancellationToken cancellationToken)
         {
             using var scope = _scopeFactory.CreateScope();
+
             var context = scope.ServiceProvider
-                .GetRequiredService<TaskDbContext>();
+                .GetRequiredService<TaskPulseDbContext>();
+
+            var observers = scope.ServiceProvider
+                .GetServices<ISlaExpiredObserver>();
 
             var expiredTasks = await context.Tasks
                 .Where(x => !x.IsCompleted && x.DueAt < DateTimeOffset.UtcNow)
@@ -41,11 +42,12 @@ namespace TaskPulse.Infrastructure.BackgroundServices
 
             foreach (var task in expiredTasks)
             {
-                foreach (var observer in _observers)
+                foreach (var observer in observers)
                 {
                     await observer.OnSlaExpiredAsync(task);
                 }
             }
         }
+
     }
 }

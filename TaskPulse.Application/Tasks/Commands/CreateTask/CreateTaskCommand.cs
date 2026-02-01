@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using TaskPulse.Application.Models;
+using TaskPulse.Domain.Entities;
 
 namespace TaskPulse.Application.Tasks.Commands.CreateTask
 {
@@ -8,5 +9,5 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
         string Title,
         int SlaHours,
         FileUpload? File
-    ) : IRequest<Guid>;
+    ) : IRequest<TaskEntity>;
 }

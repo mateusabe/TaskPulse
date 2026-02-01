@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,8 @@ namespace TaskPulse.Application.Abstractions.Repositories
     public interface INotificationRepository
     {
         Task<List<Notification>> GetAsync();
-        Task UpdateAsync(Notification task);
+        Task<Notification?> GetByIdAsync(Guid id);
+        Task<List<Notification>?> GetByTaskIdAsync(Guid taskId);
+        Task UpdateAsync(Notification notification);
     }
 }

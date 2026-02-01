@@ -4,13 +4,13 @@ namespace TaskPulse.Domain.Entities
 {
     public class Notification
     {
-        public Guid Id { get; }
-        public Guid TaskId { get; }
+        public Guid Id { get; private set; }
+        public Guid TaskId { get; private set; }
         public string Message { get; private set; }
         public DateTimeOffset CreatedAt { get; }
         public DateTimeOffset ReadAt { get; private set; }
         public bool IsRead { get; private set; } = false;
-        public TaskEntity TaskInfo { get; set; }
+        public TaskEntity? TaskInfo { get; private set; }
 
         public Notification(
             Guid taskId,

@@ -6,7 +6,7 @@ using TaskPulse.Domain.ValueObjects;
 
 namespace TaskPulse.Application.Tasks.Commands.CreateTask
 {
-    public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Guid>
+    public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskEntity>
     {
         private readonly ITaskRepository _repository;
         private readonly IFileStorage _fileStorage;
@@ -19,7 +19,7 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
             _fileStorage = fileStorage;
         }
 
-        public async Task<Guid> Handle(
+        public async Task<TaskEntity> Handle(
             CreateTaskCommand request,
             CancellationToken cancellationToken)
         {
@@ -38,7 +38,7 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
 
             await _repository.AddAsync(task);
 
-            return task.Id;
+            return task;
         }
     }
 }

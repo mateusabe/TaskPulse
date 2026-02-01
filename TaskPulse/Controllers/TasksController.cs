@@ -37,13 +37,13 @@ namespace TaskPulse.API.Controllers
                         request.File.OpenReadStream()
                     );
 
-                var taskId = await _mediator.Send(
+                var task = await _mediator.Send(
                     new CreateTaskCommand(
                         request.Title,
                         request.SlaHours,
                         fileUpload));
 
-                return Ok(taskId);
+                return Ok(task);
             }      
             catch (Exception ex)
             {
@@ -66,8 +66,8 @@ namespace TaskPulse.API.Controllers
                 CreatedAt = x.CreatedAt,
                 DueAt = x.DueAt,
                 IsCompleted = x.IsCompleted,
-                IsSlaBreached = x.IsSlaExpired(DateTimeOffset.Now)
-            });
+                IsSlaBreached = x.IsSlaExpired(DateTimeOffset.UtcNow)
+            }).ToList();
 
             return Ok(response);
         }

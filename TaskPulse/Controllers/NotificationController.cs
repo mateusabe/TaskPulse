@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskPulse.API.Contracts.Responses;
+using TaskPulse.Application.Notifications.Commands;
 using TaskPulse.Application.Notifications.Queries.GetNotifications;
 
 namespace TaskPulse.API.Controllers
@@ -33,6 +34,14 @@ namespace TaskPulse.API.Controllers
             }).ToList();
 
             return response;
+        }
+
+        [HttpPatch("/{notificationId}/read")]
+        public async Task<IActionResult> MarkAsRead(Guid notificationId)
+        {
+            await _mediator.Send(
+                new ReadNotificationCommand(notificationId));
+            return NoContent();
         }
     }
 }

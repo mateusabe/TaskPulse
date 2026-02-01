@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskPulse.Application.Abstractions.Repositories;
 using TaskPulse.Domain.Entities;
-using TaskPulse.Infrastructure.Data.Context;
 
 namespace TaskPulse.Infrastructure.Data.Repositories
 {
     public class TaskRepository : ITaskRepository
     {
-        private readonly TaskDbContext _context;
+        private readonly TaskPulseDbContext _context;
 
-        public TaskRepository(TaskDbContext context)
+        public TaskRepository(TaskPulseDbContext context)
         {
             _context = context;
         }

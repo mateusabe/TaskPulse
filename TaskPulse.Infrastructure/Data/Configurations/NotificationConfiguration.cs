@@ -39,10 +39,9 @@ namespace TaskPulse.Infrastructure.Data.Configurations
 
             builder
                 .HasOne(n => n.TaskInfo)
-                .WithMany(i => i.notifications)
-                .HasForeignKey(i => new { i.TaskId })
-                .HasPrincipalKey(n => new { n.Id })
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(t => t.Notifications)
+                .HasForeignKey(n => n.TaskId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(x => x.IsRead);
         }
