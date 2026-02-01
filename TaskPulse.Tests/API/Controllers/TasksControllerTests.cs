@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskPulse.Tests.API
+namespace TaskPulse.Tests.API.Controllers
 {
     [TestFixture]
 public class TasksControllerTests

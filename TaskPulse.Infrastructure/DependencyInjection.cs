@@ -18,12 +18,6 @@ namespace TaskPulse.Infrastructure
             IConfiguration configuration,
             bool enableBackgroundServices = true)
         {
-            // Database
-            services.AddDbContext<TaskPulseDbContext>(options =>
-                options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"))
-            );
-
             // Repositories
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -33,6 +27,12 @@ namespace TaskPulse.Infrastructure
 
             if (enableBackgroundServices)
             {
+                // Database
+                services.AddDbContext<TaskPulseDbContext>(options =>
+                    options.UseNpgsql(
+                        configuration.GetConnectionString("DefaultConnection"))
+                );
+
                 // SLA observers
                 services.AddScoped<ISlaExpiredObserver, DatabaseSlaExpiredObserver>();
                 services.AddHostedService<SlaMonitorService>();

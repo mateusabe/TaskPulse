@@ -11,8 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskPulse.Application.Abstractions.Repositories;
 using TaskPulse.Application.Abstractions.Storage;
+using TaskPulse.Infrastructure;
 using TaskPulse.Infrastructure.BackgroundServices;
-using TaskPulse.Infrastructure.Data.Context;
+using TaskPulse.Infrastructure.Data;
 using TaskPulse.Infrastructure.Data.Repositories;
 using TaskPulse.Tests.Fakes;
 
@@ -24,13 +25,13 @@ namespace TaskPulse.Tests.API
         {
             builder.UseEnvironment("Test");
 
-            builder.ConfigureServices(services =>
+            builder.ConfigureServices((context, services) =>
             {
                 // 🔥 Remove DbContext original
-                services.RemoveAll<TaskDbContext>();
-                services.RemoveAll<DbContextOptions<TaskDbContext>>();
+                services.RemoveAll<TaskPulseDbContext>();
+                services.RemoveAll<DbContextOptions<TaskPulseDbContext>>();
 
-                // 🔥 Remove SlaMonitorService
+                // 🔥 Remove SlaMonitorService (BackgroundService)
                 var slaServices = services
                     .Where(s =>
                         s.ServiceType == typeof(IHostedService) &&
@@ -41,16 +42,17 @@ namespace TaskPulse.Tests.API
                     services.Remove(service);
 
                 // 🔥 Registra InMemory
-                services.AddDbContext<TaskDbContext>(options =>
+                services.AddDbContext<TaskPulseDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("TestDb");
                 });
 
-                // 🔥 Registra Infra necessária
-                services.AddScoped<ITaskRepository, TaskRepository>();
+                // 🔥 Infra (repos, handlers, etc)
+                services.AddInfrastructure(context.Configuration, false);
+
+                // 🔥 Substituições específicas de teste
                 services.AddScoped<IFileStorage, FakeFileStorage>();
             });
         }
     }
-
 }

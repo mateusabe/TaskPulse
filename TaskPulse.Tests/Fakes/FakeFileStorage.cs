@@ -10,6 +10,11 @@ namespace TaskPulse.Tests.Fakes
 {
     public class FakeFileStorage : IFileStorage
     {
+        public Task<FileUpload> GetAsync(string path, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<string> SaveAsync(
             FileUpload file,
             CancellationToken cancellationToken)
