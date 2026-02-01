@@ -2,13 +2,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# copia só o csproj
-COPY TaskPulse/*.csproj ./TaskPulse.API/
-RUN dotnet restore ./TaskPulse/TaskPulse.API.csproj
+# copia o csproj para a MESMA estrutura
+COPY TaskPulse/TaskPulse.API.csproj TaskPulse/
+RUN dotnet restore TaskPulse/TaskPulse.API.csproj
 
-# copia o resto
+# copia todo o resto
 COPY . .
-RUN dotnet publish ./TaskPulse/TaskPulse.API.csproj -c Release -o out
+RUN dotnet publish TaskPulse/TaskPulse.API.csproj -c Release -o out
 
 # ===== RUNTIME =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
