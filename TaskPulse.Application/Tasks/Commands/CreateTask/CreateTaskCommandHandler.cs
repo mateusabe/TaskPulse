@@ -24,7 +24,7 @@ namespace TaskPulse.Application.Tasks.Commands.CreateTask
             CancellationToken cancellationToken)
         {
             var sla = new Sla(request.SlaHours);
-            var now = DateTime.UtcNow;
+            var now = DateTimeOffset.UtcNow;
             var filePath = string.Empty;   
 
             if(request.File != null) filePath = await _fileStorage.SaveAsync(request.File, cancellationToken);

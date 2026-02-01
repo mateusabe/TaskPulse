@@ -2,7 +2,7 @@
 using TaskPulse.Application.Abstractions.Repositories;
 using TaskPulse.Domain.Entities;
 
-namespace TaskPulse.Application.Tasks.Queries.GetNotifications
+namespace TaskPulse.Application.Notifications.Queries.GetNotifications
 {
     public class GetNotificationsQueryHandler : IRequestHandler<GetNotificationsQuery, List<Notification>>
     {

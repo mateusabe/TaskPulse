@@ -1,8 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskPulse.API.Contracts.Responses;
-using TaskPulse.Application.Tasks.Queries.GetNotifications;
-using TaskPulse.Application.Tasks.Queries.GetTasks;
+using TaskPulse.Application.Notifications.Queries.GetNotifications;
 
 namespace TaskPulse.API.Controllers
 {
