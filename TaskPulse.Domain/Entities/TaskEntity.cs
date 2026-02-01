@@ -47,6 +47,10 @@ namespace TaskPulse.Domain.Entities
             CompletedAt = now;
         }
 
+        public void AttachFile(string path)
+        {
+            AttachmentPath = path;
+        }
         public bool IsSlaExpired(DateTimeOffset now)
             => !IsCompleted && now > DueAt;
     }

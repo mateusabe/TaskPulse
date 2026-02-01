@@ -4,8 +4,10 @@
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = null!;
+        public string? AttachmentPath { get; set; } = null!;
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset DueAt { get; set; }
+        public DateTimeOffset? CompletedAt { get; set; }
         public bool IsCompleted { get; set; }
         public bool IsSlaBreached { get; set; }
     }

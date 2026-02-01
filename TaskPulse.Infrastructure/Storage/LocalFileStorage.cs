@@ -22,5 +22,18 @@ namespace TaskPulse.Infrastructure.Storage
 
             return filePath;
         }
+
+        public async Task<FileUpload> GetAsync(
+            string path,
+            CancellationToken cancellationToken)
+        {
+            var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+            return new FileUpload(
+                Path.GetFileName(path),                
+                "application/octet-stream",
+                stream
+            );
+        }
     }
 }

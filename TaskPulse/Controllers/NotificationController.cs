@@ -36,7 +36,7 @@ namespace TaskPulse.API.Controllers
             return response;
         }
 
-        [HttpPatch("/{notificationId}/read")]
+        [HttpPut("{notificationId}/read")]
         public async Task<IActionResult> MarkAsRead(Guid notificationId)
         {
             await _mediator.Send(

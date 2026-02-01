@@ -1,319 +1,199 @@
-🚀 Task Pulse
+# Task Pulse
 
-Task Pulse é uma API moderna para gerenciamento de tarefas com SLA, desenvolvida como desafio técnico, com foco em arquitetura limpa, boas práticas, testabilidade e clareza de decisões técnicas.
+Sistema de gerenciamento de tarefas com controle de SLA, upload de arquivos e notificações, desenvolvido como desafio técnico utilizando **.NET 8**, seguindo princípios de **Clean Architecture**, **DDD light** e boas práticas de engenharia de software.
 
-O sistema permite criar tarefas com SLA, anexos, listar tarefas, monitorar expiração de SLA em background e gerar notificações para o usuário.
+---
 
-🧱 Arquitetura
+## 🧱 Arquitetura Utilizada
 
-O projeto segue os princípios de Clean Architecture, com uma abordagem DDD Light, separando claramente responsabilidades e dependências.
+O projeto foi estruturado seguindo **Clean Architecture**, separando claramente responsabilidades e garantindo baixo acoplamento entre camadas:
 
+```
 src/
- ├── TaskPulse.Api
- ├── TaskPulse.Application
- ├── TaskPulse.Domain
- ├── TaskPulse.Infrastructure
- └── TaskPulse.Tests
+ ├── TaskPulse.Api            → Camada de apresentação (Controllers, DTOs)
+ ├── TaskPulse.Application    → Casos de uso, Commands, Queries, Handlers
+ ├── TaskPulse.Domain         → Entidades, regras de negócio, Value Objects
+ ├── TaskPulse.Infrastructure → EF Core, PostgreSQL, File Storage, Background Services
+ └── TaskPulse.Tests          → Testes unitários e de integração
+```
 
-📌 Princípios aplicados
+### Por que Clean Architecture?
 
-SOLID
+* Facilita manutenção e evolução
+* Permite testar regras de negócio sem dependências externas
+* Infraestrutura pode ser trocada (DB, Storage, Notificações) sem impacto no domínio
 
-Clean Architecture
+---
 
-DDD Light
+## 🧠 Design Patterns Utilizados
 
-Dependency Inversion
+### 1️⃣ **Mediator (MediatR)**
 
-Separation of Concerns
+Utilizado para desacoplar Controllers da lógica de negócio.
 
-Testabilidade desde o início
+* Controllers apenas enviam comandos/queries
+* Handlers concentram a regra de cada caso de uso
 
-📦 Projetos
-🔹 TaskPulse.Domain
+**Benefícios:**
 
-Camada central do sistema, contendo regras de negócio puras, sem dependência de frameworks.
+* Código mais limpo
+* Facilita testes
+* Evita controllers inchados
 
-Entidades principais:
+---
 
-TaskEntity
+### 2️⃣ **Command / Query (CQRS light)**
 
-Notification
+Separação clara entre:
 
-Value Objects:
+* **Commands** → ações que alteram estado (CreateTask, CompleteTask)
+* **Queries** → apenas leitura (GetTasks, GetTaskById)
 
-Sla
+**Benefícios:**
 
-Responsabilidades:
+* Clareza de intenção
+* Menos efeitos colaterais
+* Queries mais performáticas
 
-Garantir invariantes
+---
 
-Regras como:
+### 3️⃣ **Observer**
 
-Cálculo de DueAt
+Utilizado no monitoramento de SLA expirado.
 
-Verificação de SLA expirado
+* O `SlaMonitorService` observa tarefas não concluídas
+* Quando o SLA expira, dispara notificações
 
-Conclusão de tarefas
+Hoje a notificação é simulada via log, mas o padrão permite facilmente:
 
-Marcação de notificações como lidas
+* E-mail
+* Push notification
+* WebSocket / SignalR
 
-👉 Nenhuma dependência externa.
+---
 
-🔹 TaskPulse.Application
+### 4️⃣ **Repository Pattern**
 
-Orquestra os casos de uso do sistema.
+Abstração de acesso a dados definida na Application e implementada na Infrastructure.
 
-Contém:
+**Benefícios:**
 
-Commands e Queries (CQRS)
+* Domínio e Application não conhecem EF Core
+* Facilita troca de banco
+* Facilita testes unitários
 
-Handlers (MediatR)
+---
 
-Abstrações:
+### 5️⃣ **Value Object**
 
-ITaskRepository
+Utilizado para representar o **SLA**.
 
-IFileStorage
+* Encapsula validação
+* Evita valores inválidos espalhados pelo código
+* Reforça linguagem do domínio
 
-INotificationPublisher
+---
 
-Exemplos:
+## 📦 Bibliotecas e Pacotes Utilizados
 
-CreateTaskCommand
+### 🔹 **ASP.NET Core (.NET 8)**
 
-CompleteTaskCommand
+Framework principal para construção da API REST.
 
-GetTasksQuery
+### 🔹 **Entity Framework Core + Npgsql**
 
-👉 A Application não conhece banco, web, EF, nem filesystem.
+* ORM para persistência
+* PostgreSQL como banco relacional
+* Índices criados para queries performáticas
 
-🔹 TaskPulse.Infrastructure
+### 🔹 **MediatR**
 
-Implementações concretas das abstrações da Application.
+* Implementação do padrão Mediator
+* Comunicação desacoplada entre camadas
 
-Inclui:
+### 🔹 **Swagger (Swashbuckle)**
 
-Entity Framework Core (PostgreSQL)
+* Documentação automática da API
+* Facilita testes e validação dos endpoints
 
-Repositórios
+### 🔹 **NUnit**
 
-File Storage local
+* Framework de testes
+* Escolhido por aderência ao padrão utilizado pela empresa
 
-Background Service de SLA
+---
 
-Observers de notificação
+## 📁 Upload e Download de Arquivos
 
-Mapeamento EF Core
+O upload de arquivos é realizado através de uma abstração (`IFileStorage`).
 
-Banco de dados (PostgreSQL):
+* Implementação atual: **LocalFileStorage** (salva arquivos em pasta local)
+* O caminho do arquivo é persistido no banco
 
-CREATE TABLE tasks (
-  id UUID PRIMARY KEY,
-  title VARCHAR(150) NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  sla_hours INT NOT NULL,
-  due_at TIMESTAMP NOT NULL,
-  is_completed BOOLEAN NOT NULL DEFAULT FALSE,
-  completed_at TIMESTAMP NULL,
-  attachment_path TEXT NOT NULL
-);
+Essa abordagem permite facilmente trocar a implementação para:
 
-CREATE INDEX idx_tasks_is_completed ON tasks(is_completed);
-CREATE INDEX idx_tasks_due_at ON tasks(due_at);
+* AWS S3
+* Azure Blob Storage
+* Google Cloud Storage
 
+Sem impacto nas camadas superiores.
 
-📌 Índices criados intencionalmente para garantir queries performáticas, conforme solicitado no desafio.
+---
 
-🔹 TaskPulse.Api
+## ⏰ SLA e Conclusão de Tarefas Expiradas
 
-Camada de entrada da aplicação.
+Uma decisão importante de negócio foi **permitir a conclusão da tarefa mesmo após o SLA expirar**.
 
-Responsabilidades:
+### Por quê?
 
-Controllers REST
+* SLA expirado indica atraso, não invalida a tarefa
+* Evita bloquear o fluxo do usuário
+* Reflete cenários reais de negócio
 
-Validação de entrada
+O sistema:
 
-Swagger
+* Marca SLA como expirado
+* Gera notificação
+* Permite conclusão normalmente
 
-Upload multipart/form-data
+Essa decisão mantém o sistema flexível e mais realista.
 
-Versionamento de API
+---
 
-Exemplo de endpoint:
+## 🧪 Testes
 
-POST /api/v1/tasks
+### 🔹 Testes Unitários
 
-multipart/form-data
-- Title
-- SlaHours
-- File (opcional)
+* Entidades de domínio (ex: verificação de SLA)
+* Handlers de Commands e Queries
 
-🔹 TaskPulse.Tests
+### 🔹 Testes de Integração
 
-Testes automatizados usando NUnit (padrão utilizado pela empresa).
+* API completa via `WebApplicationFactory`
+* Banco em memória
+* Validação real de endpoints
 
-Tipos de testes
+---
 
-✅ Unitários
+## 🚧 Maiores Desafios do Teste
 
-Domain (ex: IsSlaExpired)
+* Configuração correta de testes de integração
+* Isolamento do banco PostgreSQL para InMemory
+* Remoção de HostedServices durante testes
+* Garantir que Application não dependesse da Web
+* Manter arquitetura limpa sem overengineering
 
-Application Handlers
+Esses desafios reforçaram decisões arquiteturais importantes e boas práticas de desacoplamento.
 
-✅ Integração
+---
 
-API completa via WebApplicationFactory
+## ✅ Conclusão
 
-Banco em memória (InMemory)
+O **Task Pulse** foi desenvolvido priorizando:
 
-Infra isolada por ambiente
+* Qualidade de código
+* Arquitetura sustentável
+* Testabilidade
+* Clareza de regras de negócio
 
-🧠 Design Patterns Utilizados
-🧩 Factory
-
-Usado na criação de entidades para garantir invariantes e consistência.
-
-Por quê?
-
-Evita entidades inválidas
-
-Centraliza regras de criação
-
-🧩 Value Object
-
-Exemplo: Sla
-
-Por quê?
-
-Evita tipos primitivos espalhados
-
-Encapsula validação e comportamento
-
-Código mais expressivo e seguro
-
-🧩 Repository
-
-Isola acesso a dados.
-
-Por quê?
-
-Domain e Application não conhecem EF Core
-
-Facilita testes
-
-Permite troca de persistência
-
-🧩 Mediator (MediatR)
-
-Usado para Commands e Queries.
-
-Por quê?
-
-Desacopla controllers da lógica
-
-Facilita testes
-
-Organiza casos de uso
-
-🧩 Observer
-
-Usado no monitoramento de SLA e notificações.
-
-Fluxo:
-
-SlaMonitorService detecta SLA expirado
-
-Dispara evento
-
-Observers geram Notification
-
-Usuário pode consultar e marcar como lida
-
-⏰ SLA + Monitoramento
-
-O sistema possui um BackgroundService que:
-
-Executa periodicamente
-
-Busca tarefas não concluídas
-
-Verifica SLA expirado
-
-Publica notificações
-
-📌 Em ambiente de testes, esse serviço é desativado para evitar interferência.
-
-🧪 Estratégia de Testes de Integração (Importante)
-
-Durante os testes:
-
-PostgreSQL é removido
-
-EF Core usa InMemoryDatabase
-
-Background Services são desabilitados
-
-FileStorage é substituído por FakeFileStorage
-
-Isso evita:
-
-Conflito de providers EF Core
-
-IO real
-
-Testes instáveis
-
-🧪 Exemplo de FakeFileStorage
-public class FakeFileStorage : IFileStorage
-{
-    public Task<string> SaveAsync(FileUpload file, CancellationToken cancellationToken)
-        => Task.FromResult("fake/path/file.txt");
-}
-
-▶️ Como rodar o projeto
-Requisitos
-
-.NET 8
-
-PostgreSQL
-
-Docker (opcional)
-
-Rodar API
-dotnet restore
-dotnet run --project src/TaskPulse.Api
-
-
-Swagger disponível em:
-
-https://localhost:xxxx/swagger
-
-🧠 Principais desafios do teste
-
-Isolamento correto da infraestrutura nos testes
-
-Conflito de providers EF Core (Postgres vs InMemory)
-
-Upload multipart/form-data
-
-Background Services em testes
-
-Design de SLA com monitoramento
-
-Arquitetura limpa sem overengineering
-
-🏁 Conclusão
-
-O Task Pulse foi desenvolvido com foco em:
-
-Clareza arquitetural
-
-Boas práticas reais de mercado
-
-Código legível e testável
-
-Decisões técnicas conscientes
-
-O projeto reflete um ambiente real de desenvolvimento backend moderno, priorizando qualidade, manutenção e evolução futura.
+O projeto está preparado para crescer, receber novas integrações e evoluir sem grandes refatorações.

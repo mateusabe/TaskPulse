@@ -5,6 +5,7 @@ using TaskPulse.API.Contracts.Responses;
 using TaskPulse.Application.Models;
 using TaskPulse.Application.Tasks.Commands.CompleteTask;
 using TaskPulse.Application.Tasks.Commands.CreateTask;
+using TaskPulse.Application.Tasks.Queries.GetTask;
 using TaskPulse.Application.Tasks.Queries.GetTasks;
 
 namespace TaskPulse.API.Controllers
@@ -23,12 +24,16 @@ namespace TaskPulse.API.Controllers
         // POST /api/tasks
         [HttpPost]
         [Consumes("multipart/form-data")]
+        [RequestSizeLimit(5 * 1024 * 1024)]
         public async Task<IActionResult> Create(
             [FromForm] CreateTaskRequest request)
         {
             try
             {
-                var fileUpload = (FileUpload?)null;
+                if (!request.IsFileSizeValid())
+                    return BadRequest("Arquivo excede o tamanho máximo de 5MB.");
+
+                var fileUpload = (FileUpload?)null;                
 
                 if (request.File != null)
                     fileUpload = new FileUpload(
@@ -66,7 +71,9 @@ namespace TaskPulse.API.Controllers
                 CreatedAt = x.CreatedAt,
                 DueAt = x.DueAt,
                 IsCompleted = x.IsCompleted,
-                IsSlaBreached = x.IsSlaExpired(DateTimeOffset.UtcNow)
+                IsSlaBreached = x.IsSlaExpired(DateTimeOffset.UtcNow),
+                AttachmentPath = x.AttachmentPath,
+                CompletedAt = x.CompletedAt
             }).ToList();
 
             return Ok(response);
@@ -78,6 +85,25 @@ namespace TaskPulse.API.Controllers
         {
             await _mediator.Send(new CompleteTaskCommand(id));
             return NoContent();
-        }        
+        }
+
+        [HttpGet("{id}/attachment")]
+        public async Task<IActionResult> DownloadAttachment(Guid id)
+        {
+            var task = await _mediator.Send(new GetTaskByIdQuery(id));
+
+            if (task.AttachmentPath is null)
+                return NotFound();
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(task.AttachmentPath);
+
+            var fileName = Path.GetFileName(task.AttachmentPath);
+
+            return File(
+                fileBytes,
+                "application/octet-stream",
+                fileName
+            );
+        }
     }
 }
