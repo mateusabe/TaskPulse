@@ -64,7 +64,7 @@ Utilizado no monitoramento de SLA expirado.
 * O `SlaMonitorService` observa tarefas não concluídas
 * Quando o SLA expira, dispara notificações
 
-Hoje a notificação é simulada via log, mas o padrão permite facilmente:
+Hoje a notificação é simulada via polling na api, mas o padrão permite facilmente:
 
 * E-mail
 * Push notification
